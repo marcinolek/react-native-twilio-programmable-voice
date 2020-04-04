@@ -134,6 +134,10 @@ RCT_EXPORT_METHOD(setSpeakerPhone: (BOOL *)speaker) {
     [self toggleAudioRoute: speaker ? YES : NO];
 }
 
+RCT_EXPORT_METHOD(setOnHold: (BOOL *)onHold) {
+    self.activeCall.onHold = onHold ? YES : NO;
+}
+
 RCT_EXPORT_METHOD(sendDigits: (NSString *)digits) {
   if (self.activeCall && self.activeCall.state == TVOCallStateConnected) {
     NSLog(@"SendDigits %@", digits);
