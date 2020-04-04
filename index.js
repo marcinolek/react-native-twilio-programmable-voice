@@ -72,7 +72,7 @@ const Twilio = {
     setMuted: TwilioVoice.setMuted,
     setSpeakerPhone: TwilioVoice.setSpeakerPhone,
     sendDigits: TwilioVoice.sendDigits,
-    hold: TwilioVoice.hold,
+    setOnHold: TwilioVoice.setOnHold,
     requestPermissions(senderId) {
         if (Platform.OS === ANDROID) {
             TwilioVoice.requestPermissions(senderId)
