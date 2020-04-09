@@ -140,7 +140,7 @@ public class CallNotificationManager {
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setCategory(NotificationCompat.CATEGORY_CALL)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
