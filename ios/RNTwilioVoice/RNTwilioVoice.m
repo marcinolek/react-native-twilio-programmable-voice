@@ -157,6 +157,7 @@ RCT_EXPORT_METHOD(unregister) {
                                         NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                     } else {
                                         NSLog(@"Successfully unregistered for VoIP push notifications.");
+                                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedDeviceToken];
                                     }
                                 }];
   }
@@ -281,6 +282,7 @@ RCT_REMAP_METHOD(getCallInvite,
                                                      NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
                                                    } else {
                                                      NSLog(@"Successfully unregistered for VoIP push notifications.");
+                                                     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kCachedDeviceToken];
                                                    }
                                                  }];
     }
