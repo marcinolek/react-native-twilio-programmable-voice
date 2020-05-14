@@ -38,6 +38,14 @@ NSString * const StateConnected = @"CONNECTED";
 NSString * const StateDisconnected = @"DISCONNECTED";
 NSString * const StateRejected = @"REJECTED";
 
+-(id)init {
+    self = [super init];
+    if (self) {
+        [self initPushRegistry];
+    }
+    return self;
+}
+
 - (dispatch_queue_t)methodQueue
 {
   return dispatch_get_main_queue();
