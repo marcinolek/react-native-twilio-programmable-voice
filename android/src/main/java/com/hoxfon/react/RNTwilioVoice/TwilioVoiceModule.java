@@ -58,6 +58,7 @@ import com.twilio.voice.Voice;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_CONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_DISCONNECT;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEIVE_INCOMING;
@@ -512,6 +513,12 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "activeCallInvite was cancelled by " + activeCallInvite.getFrom());
             }
+            if (getReactApplicationContext().getCurrentActivity() != null) {
+              Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+              window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+              );
+            }
             if (!callAccepted) {
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "creating a missed call");
@@ -547,10 +554,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (action.equals(ACTION_INCOMING_CALL)) {
                 handleIncomingCallIntent(intent);
             } else if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
+                if (getReactApplicationContext().getCurrentActivity() != null) {
+                  Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+                  window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                  );
+                }
                 CancelledCallInvite cancelledCallInvite = intent.getParcelableExtra(CANCELLED_CALL_INVITE);
                 clearIncomingNotification(cancelledCallInvite.getCallSid());
                 WritableMap params = Arguments.createMap();
                 if (cancelledCallInvite != null) {
+                    callNotificationManager.createMissedCallNotification(getReactApplicationContext(), cancelledCallInvite);
                     params.putString("call_sid", cancelledCallInvite.getCallSid());
                     params.putString("call_from", cancelledCallInvite.getFrom());
                     params.putString("call_to", cancelledCallInvite.getTo());
@@ -704,6 +718,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             // params.putString("call_state", "REJECTED");
             activeCallInvite.reject(getReactApplicationContext());
             clearIncomingNotification(activeCallInvite.getCallSid());
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                if (getReactApplicationContext().getCurrentActivity() != null) {
+                  Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+                  window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                  );
+                }
+              }
+            });
         }
         eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
     }
@@ -787,6 +812,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (activeCall != null) {
             activeCall.disconnect();
             activeCall = null;
+            runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                if (getReactApplicationContext().getCurrentActivity() != null) {
+                  Window window = getReactApplicationContext().getCurrentActivity().getWindow();
+                  window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                  );
+                }
+              }
+            });
         }
     }
 
