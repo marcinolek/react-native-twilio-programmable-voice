@@ -564,7 +564,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 clearIncomingNotification(cancelledCallInvite.getCallSid());
                 WritableMap params = Arguments.createMap();
                 if (cancelledCallInvite != null) {
-                    callNotificationManager.createMissedCallNotification(getReactApplicationContext(), cancelledCallInvite);
+                    callNotificationManager.createMissedInviteNotification(getReactApplicationContext(), cancelledCallInvite);
                     params.putString("call_sid", cancelledCallInvite.getCallSid());
                     params.putString("call_from", cancelledCallInvite.getFrom());
                     params.putString("call_to", cancelledCallInvite.getTo());
