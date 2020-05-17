@@ -554,17 +554,10 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (action.equals(ACTION_INCOMING_CALL)) {
                 handleIncomingCallIntent(intent);
             } else if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
-                if (getReactApplicationContext().getCurrentActivity() != null) {
-                  Window window = getReactApplicationContext().getCurrentActivity().getWindow();
-                  window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                    | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                  );
-                }
                 CancelledCallInvite cancelledCallInvite = intent.getParcelableExtra(CANCELLED_CALL_INVITE);
                 clearIncomingNotification(cancelledCallInvite.getCallSid());
                 WritableMap params = Arguments.createMap();
                 if (cancelledCallInvite != null) {
-                    callNotificationManager.createMissedCallNotification(getReactApplicationContext(), cancelledCallInvite);
                     params.putString("call_sid", cancelledCallInvite.getCallSid());
                     params.putString("call_from", cancelledCallInvite.getFrom());
                     params.putString("call_to", cancelledCallInvite.getTo());
