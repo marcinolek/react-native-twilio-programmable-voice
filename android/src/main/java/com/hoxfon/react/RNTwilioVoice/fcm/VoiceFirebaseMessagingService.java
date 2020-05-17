@@ -1,11 +1,14 @@
 package com.hoxfon.react.RNTwilioVoice.fcm;
 
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.facebook.react.ReactApplication;
@@ -87,6 +90,11 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                             ReactContext context = mReactInstanceManager.getCurrentReactContext();
                             // If it's constructed, send a notification
                             if (context != null) {
+                                TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                                if(telephony.getCallState()!=TelephonyManager.CALL_STATE_IDLE) {
+                                  callInvite.reject(context);
+                                  return;
+                                }
                                 int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
                                 if (BuildConfig.DEBUG) {
                                     Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
@@ -119,6 +127,11 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                                         int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
                                         if (BuildConfig.DEBUG) {
                                             Log.d(TAG, "CONTEXT not present appImportance = " + appImportance);
+                                        }
+                                        TelephonyManager telephony = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                                        if(telephony.getCallState()!=TelephonyManager.CALL_STATE_IDLE) {
+                                          callInvite.reject(context);
+                                          return;
                                         }
                                         Intent launchIntent = callNotificationManager.getLaunchIntent((ReactApplicationContext)context, notificationId, callInvite, true, appImportance);
                                         context.startActivity(launchIntent);
