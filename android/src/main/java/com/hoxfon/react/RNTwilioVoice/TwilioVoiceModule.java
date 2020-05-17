@@ -510,14 +510,17 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             }
         } else if (intent.getAction().equals(ACTION_CANCEL_CALL_INVITE)) {
             SoundPoolManager.getInstance(getReactApplicationContext()).stopRinging();
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "activeCallInvite was cancelled by " + activeCallInvite.getFrom());
-            }
             if (getReactApplicationContext().getCurrentActivity() != null) {
               Window window = getReactApplicationContext().getCurrentActivity().getWindow();
               window.clearFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
               );
+            }
+            if(activeCallInvite == null) {
+              return;
+            }
+            if (BuildConfig.DEBUG) {
+              Log.d(TAG, "activeCallInvite was cancelled by " + activeCallInvite.getFrom());
             }
             if (!callAccepted) {
                 if (BuildConfig.DEBUG) {
@@ -531,7 +534,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     params.putString("call_from", activeCallInvite.getFrom());
                     params.putString("call_to", activeCallInvite.getTo());
                     params.putString("call_state", Call.State.DISCONNECTED.toString());
-                    eventManager.sendEvent(EVENT_CONNECTION_DID_DISCONNECT, params);
+                    eventManager.sendEvent(EVENT_CALL_INVITE_CANCELLED, params);
                 }
             }
             clearIncomingNotification(activeCallInvite.getCallSid());
@@ -554,15 +557,16 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             if (action.equals(ACTION_INCOMING_CALL)) {
                 handleIncomingCallIntent(intent);
             } else if (action.equals(ACTION_CANCEL_CALL_INVITE)) {
-                CancelledCallInvite cancelledCallInvite = intent.getParcelableExtra(CANCELLED_CALL_INVITE);
-                clearIncomingNotification(cancelledCallInvite.getCallSid());
-                WritableMap params = Arguments.createMap();
-                if (cancelledCallInvite != null) {
-                    params.putString("call_sid", cancelledCallInvite.getCallSid());
-                    params.putString("call_from", cancelledCallInvite.getFrom());
-                    params.putString("call_to", cancelledCallInvite.getTo());
-                }
-                eventManager.sendEvent(EVENT_CALL_INVITE_CANCELLED, params);
+                handleIncomingCallIntent(intent);
+//                CancelledCallInvite cancelledCallInvite = intent.getParcelableExtra(CANCELLED_CALL_INVITE);
+//                clearIncomingNotification(cancelledCallInvite.getCallSid());
+//                WritableMap params = Arguments.createMap();
+//                if (cancelledCallInvite != null) {
+//                    params.putString("call_sid", cancelledCallInvite.getCallSid());
+//                    params.putString("call_from", cancelledCallInvite.getFrom());
+//                    params.putString("call_to", cancelledCallInvite.getTo());
+//                }
+//                eventManager.sendEvent(EVENT_CALL_INVITE_CANCELLED, params);
             } else if (action.equals(ACTION_MISSED_CALL)) {
                 SharedPreferences sharedPref = getReactApplicationContext().getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
                 SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
