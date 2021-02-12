@@ -361,8 +361,9 @@ withCompletionHandler:(void (^)(void))completion {
     if (callInvite.from) {
         from = [callInvite.from stringByReplacingOccurrencesOfString:@"client:" withString:@""];
     }
+    NSString *callerName = callInvite.customParameters[@"callerName"];
     // Always report to CallKit
-    [self reportIncomingCallFrom:from withUUID:callInvite.uuid];
+    [self reportIncomingCallFrom:from callerName:callerName withUUID:callInvite.uuid];
     self.activeCallInvites[[callInvite.uuid UUIDString]] = callInvite;
     if ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion < 13) {
         [self incomingPushHandled];
@@ -724,11 +725,12 @@ withCompletionHandler:(void (^)(void))completion {
   }];
 }
 
-- (void)reportIncomingCallFrom:(NSString *)from withUUID:(NSUUID *)uuid {
+- (void)reportIncomingCallFrom:(NSString *)from callerName:(NSString *)callerName withUUID:(NSUUID *)uuid {
   CXHandle *callHandle = [[CXHandle alloc] initWithType:CXHandleTypeGeneric value:from];
 
   CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
   callUpdate.remoteHandle = callHandle;
+  callUpdate.localizedCallerName = callerName;
   callUpdate.supportsDTMF = YES;
   callUpdate.supportsHolding = YES;
   callUpdate.supportsGrouping = NO;
