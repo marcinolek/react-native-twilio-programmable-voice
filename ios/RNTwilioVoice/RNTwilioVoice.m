@@ -289,8 +289,9 @@ RCT_REMAP_METHOD(getActiveCall,
   }
 
   self.callInvite = callInvite;
+  NSString *callerName = callInvite.customParameters[@"callerName"];
 
-  [self reportIncomingCallFrom:callInvite.from withUUID:callInvite.uuid];
+  [self reportIncomingCallFrom:callInvite.from callerName:callerName withUUID:callInvite.uuid];
 }
 
 - (void)handleCallInviteCanceled:(TVOCallInvite *)callInvite {
@@ -528,11 +529,12 @@ RCT_REMAP_METHOD(getActiveCall,
   }];
 }
 
-- (void)reportIncomingCallFrom:(NSString *)from withUUID:(NSUUID *)uuid {
+- (void)reportIncomingCallFrom:(NSString *)from callerName:(NSString *)callerName withUUID:(NSUUID *)uuid {
   CXHandle *callHandle = [[CXHandle alloc] initWithType:CXHandleTypeGeneric value:from];
 
   CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
   callUpdate.remoteHandle = callHandle;
+  callUpdate.localizedCallerName = callerName;
   callUpdate.supportsDTMF = YES;
   callUpdate.supportsHolding = YES;
   callUpdate.supportsGrouping = NO;
