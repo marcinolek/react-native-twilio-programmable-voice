@@ -133,6 +133,9 @@ public class CallNotificationManager {
         extras.putInt(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         extras.putString(CALL_SID_KEY, callInvite.getCallSid());
         extras.putString(NOTIFICATION_TYPE, ACTION_INCOMING_CALL);
+
+        String callerName = callInvite.getCustomParameters().get("callerName");
+        String fromText = callerName != null ? callerName : callInvite.getFrom();
         /*
          * Create the notification shown in the notification drawer
          */
@@ -145,7 +148,7 @@ public class CallNotificationManager {
                         .setCategory(NotificationCompat.CATEGORY_CALL)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
                         .setContentTitle("Incoming call")
-                        .setContentText(callInvite.getFrom() + " is calling")
+                        .setContentText(fromText + " is calling")
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
@@ -220,6 +223,9 @@ public class CallNotificationManager {
         extras.putString(CALL_SID_KEY, callInvite.getCallSid());
         extras.putString(NOTIFICATION_TYPE, ACTION_MISSED_CALL);
 
+        String callerName = callInvite.getCustomParameters().get("callerName");
+        String fromText = callerName != null ? callerName : callInvite.getFrom();
+
         /*
          * Create the notification shown in the notification drawer
          */
@@ -232,7 +238,7 @@ public class CallNotificationManager {
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .setSmallIcon(R.drawable.ic_call_missed_white_24dp)
                         .setContentTitle("Missed call")
-                        .setContentText(callInvite.getFrom() + " called")
+                        .setContentText(fromText + " called")
                         .setAutoCancel(true)
                         .setShowWhen(true)
                         .setExtras(extras)
@@ -247,7 +253,7 @@ public class CallNotificationManager {
         } else {
             inboxStyle.setBigContentTitle(String.valueOf(missedCalls) + " missed calls");
         }
-        inboxStyle.addLine("from: " +callInvite.getFrom());
+        inboxStyle.addLine("from: " +fromText);
         sharedPrefEditor.putInt(MISSED_CALLS_GROUP, missedCalls);
         sharedPrefEditor.commit();
 
