@@ -12,7 +12,7 @@ public class SoundPoolManager {
     private Ringtone ringtone = null;
 
     private SoundPoolManager(Context context) {
-        Uri ringtoneSound = RingtoneManager.getActualDefaultRingtoneUri(RingtoneManager.TYPE_RINGTONE);
+        Uri ringtoneSound = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
         ringtone = RingtoneManager.getRingtone(context, ringtoneSound);
     }
 
