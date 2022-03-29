@@ -1,5 +1,66 @@
 [Release Section](https://github.com/hoxfon/react-native-twilio-programmable-voice/releases)
 
+## 4.4.0
+
+- iOS:
+  - project.pbxproj aligned to Xcode 12.4
+  - amend podspec
+  - remove not necessary files
+  - improve package.json syntax
+  - add peerDependency on react-native 0.60.0
+
+## 4.3.1
+
+- Android: ensure that intent action is not null
+
+## 4.3.0
+
+- iOS add handler to hold/unhold call
+
+## 4.2.0
+
+- iOS
+  - Added ability to pass caller's name to CallKit in push notification
+
+## 4.1.0
+
+- iOS
+  - Adds ability to handle DTMF codes in CallKit
+
+## 4.0.2
+
+- iOS
+  - fix: always disable proximityMonitor on iOS when the call is disconnected
+
+## 4.0.0
+
+- Android
+  - implement new autolinking react native API
+  - update Firebase Messaging to 17.3.4 which simplifies how to obtain the FCM token
+  - Android X migration
+  - use gradle 5.4.1
+  - use API 28
+  - upgrade com.twilio:voice-android to 4.3.0
+  - implement `hold` to hold a call
+  - new event `callInviteCancelled`
+  - new event `callStateRinging`
+  - new method `getCallInvite`
+  - implement call ringing Twilio event
+  - remove `call_state` from CallInvite
+- iOS
+  - implement new autolinking react native API
+  - update Twilio Voice SDK to v5.2.0
+  - remove method `initWithAccessTokenUrl`, please use `initWithAccessToken` instead
+  - event parity with Android `deviceDidReceiveIncoming`
+  - new event `callInviteCancelled`
+  - new event `callStateRinging`
+  - new event `connectionIsReconnecting`
+  - new event `connectionDidReconnect`
+  - convert params for `connectionDidConnect` to => `call_to`, from => `call_from`
+  - convert params for `connectionDidDisconnect` to => `call_to`, from => `call_from`, `error` => `err`
+
+- throw an error when listening to events that do not exist
+
 ## 3.21.3
 
 - iOS: Upgrade TwilioVoice pod to version 2.1
