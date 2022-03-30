@@ -671,7 +671,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
      */
     private void registerForCallInvites() {
         String fcmToken = FirebaseInstanceId.getInstance().getToken();
-        if (fcmToken == null) {
+        if (fcmToken == null || accessToken == null) {
             return;
         }
         if (BuildConfig.DEBUG) {
@@ -703,7 +703,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
                         // Get new Instance ID token
                         String fcmToken = task.getResult().getToken();
-                        if (fcmToken != null) {
+                        if (fcmToken != null && accessToken != null) {
                             if (BuildConfig.DEBUG) {
                                 Log.d(TAG, "Unregistering with FCM");
                             }
