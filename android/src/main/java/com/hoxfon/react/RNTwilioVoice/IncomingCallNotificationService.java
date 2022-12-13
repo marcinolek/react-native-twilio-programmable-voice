@@ -65,11 +65,11 @@ public class IncomingCallNotificationService extends Service {
 
             case Constants.ACTION_JS_ANSWER:
                 endForeground();
-                break;   
+                break;
 
             case Constants.ACTION_JS_REJECT:
                 endForeground();
-                break;    
+                break;
 
             default:
                 break;
@@ -97,7 +97,8 @@ public class IncomingCallNotificationService extends Service {
 
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        String callerName = callInvite.getCustomParameters().get("callerName");
+        String fromText = callerName != null ? callerName : callInvite.getFrom();
         /*
          * Pass the notification id and call sid to use as an identifier to cancel the
          * notification later
@@ -105,7 +106,7 @@ public class IncomingCallNotificationService extends Service {
         Bundle extras = new Bundle();
         extras.putString(Constants.CALL_SID_KEY, callInvite.getCallSid());
 
-        String contentText = callInvite.getFrom() + " " + getString(R.string.call_incoming_content);
+        String contentText = fromText + " " + getString(R.string.call_incoming_content);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return buildNotification(contentText,
                     pendingIntent,
