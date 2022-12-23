@@ -178,15 +178,22 @@ public class IncomingCallNotificationService extends Service {
                 createActionPendingIntent(context, rejectIntent)
         ).build();
 
-        Intent acceptIntent = new Intent(context, IncomingCallNotificationService.class);
+        Intent acceptIntent = new Intent(context, getMainActivityClass(this));
+        acceptIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        acceptIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         acceptIntent.setAction(Constants.ACTION_ACCEPT);
         acceptIntent.putExtra(Constants.INCOMING_CALL_INVITE, callInvite);
         acceptIntent.putExtra(Constants.INCOMING_CALL_NOTIFICATION_ID, notificationId);
-        NotificationCompat.Action answerAction = new NotificationCompat.Action.Builder(
-                android.R.drawable.ic_menu_call,
-                getActionText(context, R.string.accept, R.color.green),
-                createActionPendingIntent(context, acceptIntent)
-        ).build();
+        acceptIntent.putExtra(Constants.CALL_SID, callInvite.getCallSid());
+        acceptIntent.putExtra(Constants.CALL_FROM, callInvite.getFrom());
+        acceptIntent.putExtra(Constants.CALL_TO, callInvite.getTo());
+  
+        PendingIntent acceptPendingIntent = PendingIntent.getActivity(context, notificationId, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+          NotificationCompat.Action answerAction = new NotificationCompat.Action.Builder(
+                  android.R.drawable.ic_menu_call,
+                  getActionText(context, R.string.accept, R.color.green),
+            acceptPendingIntent
+          ).build();
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context, channelId)
