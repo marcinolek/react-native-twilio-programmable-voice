@@ -290,6 +290,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onConnected(). Call state: " + call.getState());
                 }
+                
+                startAudioSwitch();
                 audioSwitch.activate();
                 proximityManager.startProximitySensor();
                 headsetManager.startWiredHeadsetEvent(getReactApplicationContext());
