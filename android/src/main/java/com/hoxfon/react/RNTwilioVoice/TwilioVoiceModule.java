@@ -500,8 +500,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_HANGUP_CALL);
         intentFilter.addAction(Constants.ACTION_CLEAR_MISSED_CALLS_COUNT);
-
-        getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
+        ContextCompat.registerReceiver(getReactApplicationContext(), new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -517,7 +516,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                         break;
                 }
             }
-        }, intentFilter);
+        }, intentFilter, ContextCompat.RECEIVER_EXPORTED);
     }
 
     // removed @Override temporarily just to get it working on different versions of RN

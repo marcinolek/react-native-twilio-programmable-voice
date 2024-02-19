@@ -30,6 +30,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.twilio.voice.CallInvite;
 
+import androidx.core.app.ServiceCompat;
+import android.content.pm.ServiceInfo;
+
 import static com.hoxfon.react.RNTwilioVoice.CallNotificationManager.getMainActivityClass;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
@@ -275,7 +278,7 @@ public class IncomingCallNotificationService extends Service {
 
     private void handleIncomingCall(CallInvite callInvite, int notificationId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            setCallInProgressNotification(callInvite, notificationId);
+             setCallInProgressNotification(callInvite, notificationId);
         }
         sendCallInviteToActivity(callInvite, notificationId);
     }
@@ -296,7 +299,8 @@ public class IncomingCallNotificationService extends Service {
             }
             importance = NotificationManager.IMPORTANCE_HIGH;
         }
-        this.startForeground(notificationId, createNotification(callInvite, notificationId, importance));
+        
+        startForeground(notificationId, createNotification(callInvite, notificationId, importance), ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
     }
 
     /*
