@@ -300,7 +300,7 @@ public class IncomingCallNotificationService extends Service {
             importance = NotificationManager.IMPORTANCE_HIGH;
         }
         
-        startForeground(notificationId, createNotification(callInvite, notificationId, importance), ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE);
+        startForeground(notificationId, createNotification(callInvite, notificationId, importance));
     }
 
     /*
