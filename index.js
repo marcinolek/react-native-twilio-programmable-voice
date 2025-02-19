@@ -110,14 +110,16 @@ const Twilio = {
         if (Platform.OS === IOS) {
             return
         }
-        TwilioVoice.getSelectedAudioDevice()
+        // TwilioVoice.getSelectedAudioDevice()
+        return
     },
     // selectAudioDevice selects the passed audio device for the current active call
     selectAudioDevice(name: string) {
         if (Platform.OS === IOS) {
             return
         }
-        TwilioVoice.selectAudioDevice(name)
+        return
+        // TwilioVoice.selectAudioDevice(name)
     },
     addEventListener(type, handler) {
         if (!_eventHandlers.hasOwnProperty(type)) {

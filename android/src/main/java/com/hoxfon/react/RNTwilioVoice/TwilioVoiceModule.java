@@ -43,7 +43,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import com.twilio.audioswitch.AudioDevice;
-import com.twilio.audioswitch.AudioSwitch;
+// import com.twilio.audioswitch.AudioSwitch;
 import com.twilio.voice.AcceptOptions;
 import com.twilio.voice.Call;
 import com.twilio.voice.CallException;
@@ -110,7 +110,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     /*
      * Audio device management
      */
-    private AudioSwitch audioSwitch;
+    // private AudioSwitch audioSwitch;
     private int savedVolumeControlStream;
     AudioDevice selectedAudioDevice;
     Map<String, AudioDevice> availableAudioDevices;
@@ -141,7 +141,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
         TwilioVoiceModule.callNotificationMap = new HashMap<>();
 
-        audioSwitch = new AudioSwitch(reactContext);
+        // audioSwitch = new AudioSwitch(reactContext);
         availableAudioDevices = new HashMap<>();
 
         /*
@@ -200,7 +200,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         /*
          * Tear down audio device management and restore previous volume stream
          */
-        audioSwitch.stop();
+        // audioSwitch.stop();
         getCurrentActivity().setVolumeControlStream(savedVolumeControlStream);
     }
 
@@ -300,8 +300,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     Log.d(TAG, "Call.Listener().onConnected(). Call state: " + call.getState());
                 }
                 
-                startAudioSwitch();
-                audioSwitch.activate();
+                // startAudioSwitch();
+                // audioSwitch.activate();
                 proximityManager.startProximitySensor();
                 headsetManager.startWiredHeadsetEvent(getReactApplicationContext());
 
@@ -360,7 +360,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onDisconnected(). Call state: " + call.getState());
                 }
-                audioSwitch.deactivate();
+                // audioSwitch.deactivate();
                 proximityManager.stopProximitySensor();
                 headsetManager.stopWiredHeadsetEvent(getReactApplicationContext());
 
@@ -391,7 +391,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Call.Listener().onConnectFailure(). Call state: " + call.getState());
                 }
-                audioSwitch.deactivate();
+                // audioSwitch.deactivate();
                 proximityManager.stopProximitySensor();
 
                 Log.e(TAG, String.format("CallListener onConnectFailure error: %d, %s",
@@ -669,7 +669,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         WritableMap params = Arguments.createMap();
         params.putBoolean("initialized", true);
         promise.resolve(params);
-        startAudioSwitch();
+        // startAudioSwitch();
     }
 
     /*
@@ -915,43 +915,44 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void getAudioDevices(Promise promise) {
-        List<AudioDevice> availableAudioDevices = audioSwitch.getAvailableAudioDevices();
+        // List<AudioDevice> availableAudioDevices = audioSwitch.getAvailableAudioDevices();
 
         WritableMap devices = Arguments.createMap();
-        for (AudioDevice a : availableAudioDevices) {
-            devices.putBoolean(a.getName(), selectedAudioDevice.getName().equals(a.getName()));
-        }
+        // for (AudioDevice a : availableAudioDevices) {
+        //     devices.putBoolean(a.getName(), selectedAudioDevice.getName().equals(a.getName()));
+        // }
         promise.resolve(devices);
     }
 
     @ReactMethod
     public void getSelectedAudioDevice(Promise promise) {
         WritableMap device = Arguments.createMap();
-        device.putString(Constants.SELECTED_AUDIO_DEVICE, selectedAudioDevice.getName());
+        // device.putString(Constants.SELECTED_AUDIO_DEVICE, selectedAudioDevice.getName());
         promise.resolve(device);
     }
 
     @ReactMethod
     public void selectAudioDevice(String name) {
+        return
         AudioDevice selected = availableAudioDevices.get(name);
         if (selected == null) {
             return;
         }
-        audioSwitch.selectDevice(selected);
+        // audioSwitch.selectDevice(selected);
     }
 
-    private void startAudioSwitch() {
-        audioSwitch.start((devices, device) -> {
-            selectedAudioDevice = device;
-            WritableMap params = Arguments.createMap();
-            for (AudioDevice a : devices) {
-                params.putBoolean(a.getName(), device.getName().equals(a.getName()));
-                availableAudioDevices.put(a.getName(), a);
-            }
-            eventManager.sendEvent(EVENT_AUDIO_DEVICES_UPDATED, params);
-            return Unit.INSTANCE;
-        });
-    }
+    // private void startAudioSwitch() {
+    //     audioSwitch.start((devices, device) -> {
+    //         selectedAudioDevice = device;
+    //         WritableMap params = Arguments.createMap();
+    //         for (AudioDevice a : devices) {
+    //             params.putBoolean(a.getName(), device.getName().equals(a.getName()));
+    //             availableAudioDevices.put(a.getName(), a);
+    //         }
+    //         eventManager.sendEvent(EVENT_AUDIO_DEVICES_UPDATED, params);
+    //         return Unit.INSTANCE;
+    //     });
+    // }
 
     private boolean checkPermissionForMicrophone() {
         int resultMic = ContextCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.RECORD_AUDIO);
