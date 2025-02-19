@@ -933,7 +933,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void selectAudioDevice(String name) {
-        return
+        return;
         AudioDevice selected = availableAudioDevices.get(name);
         if (selected == null) {
             return;
