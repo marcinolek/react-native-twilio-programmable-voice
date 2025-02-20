@@ -56,17 +56,14 @@ Allow Android to use the built in Android telephony service to make and receive 
 
 ### Breaking changes in v5.0.0
 
-Changes on [Android Twilio Voice SDK v5](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog#500) are reflected in the JavaScript API, the way call invites are handled has changed and other v5 features like `audioSwitch` have been implemented.
-`setSpeakerPhone()` has been removed from Android, use selectAudioDevice(name: string) instead.
+Changes on [Android Twilio Voice SDK v5](https://www.twilio.com/docs/voice/voip-sdk/android/3x-changelog#500) are reflected in the JavaScript API, the way call invites are handled and ...
 
-#### Background incoming calls
+- when the app is not in foreground incoming calls result in a heads-up notification with action to "ACCEPT" and "REJECT"
+- ReactMethod `accept` does not dispatch any event. Previously it would dispatch `connectionDidDisconnect`
+- ReactMethod `reject` dispatch a `callInviteCancelled` event instead of `connectionDidDisconnect`
+- ReactMethod `ignore` does not dispatch any event. Previously it would dispatch `connectionDidDisconnect`
 
-- When the app is not in foreground incoming calls result in a heads-up notification with action to "ACCEPT" and "REJECT".
-- ReactMethod `accept` does not dispatch any event. In v4 it dispatched `connectionDidDisconnect`.
-- ReactMethod `reject` dispatches a `callInviteCancelled` event instead of `connectionDidDisconnect`.
-- ReactMethod `ignore` does not dispatch any event. In v4 it dispatched `connectionDidDisconnect`.
-
-To show heads up notifications, you must add the following lines to your application's `android/app/src/main/AndroidManifest.xml`:
+To allow the library to show heads up notifications you must add the following lines to your application `android/app/src/main/AndroidManifest.xml`:
 
 ```xml
     <!-- receive calls when the app is in the background-->
@@ -99,22 +96,22 @@ To show heads up notifications, you must add the following lines to your applica
     </application>
 ```
 
-Firebase Messaging 19.0.+ is imported by this module, so there is no need to import it in your app's `bundle.gradle` file.
+Firebase Messaging 19.0.+ is imported by this module, so there is no need to import it in your app.
 
-In v4 the flow to launch the app when receiving a call was:
+Previously, in order to launch the app when receiving a call, the flow was:
 
-1. the module launched the app
-2. after the React app is initialised, it always asked to the native module whether there were incoming call invites
-3. if there were any incoming call invites, the module would have sent an event to the React app with the incoming call invite parameters
-4. the Reach app would have listened to the event and would have launched the view with the appropriate incoming call answer/reject controls
+1. the module would launch the app
+2. after the React app is initialised, it would always ask to the native module whether there were incoming call invites
+3. if there where any incoming call invites the module would send an event to the React app with the incoming call invite parameters
+4. the Reach app would listen to the event and launch the view with the appropriate incoming call answer/reject controls
 
-This loop was long and prone to race conditions. For example,when the event was sent before the React main view was completely initialised, it would not be handled at all.
+This loop was long and prone to race conditions. In case the event was sent before the React main view was completely initialised, it would not be handled at all.
 
-V5 replaces the previous flow by using `getLaunchOptions()` to pass initial properties from the native module to React, when receiving a call invite as explained here: https://reactnative.dev/docs/communication-android.
+Version 5.0.0 replaces the previous flow by using `getLaunchOptions()` to pass initial properties from native to React when receiving a call invite as explained here: https://reactnative.dev/docs/communication-android.
 
-The React app is launched with the initial properties `callInvite` or `call`.
+The React app will be launched with the initial properties `callInvite` or `call`.
 
-To handle correctly `lauchedOptions`, you must add the following blocks to your app's `MainActivity`:
+Add the following blocks to your app's `MainActivity`:
 
 ```java
 
@@ -156,28 +153,9 @@ public class MainActivity extends ReactActivity {
 }
 ```
 
-#### Audio Switch
-
-Access to native Twilio SDK AudioSwitch module for Android has been added to the JavaScript API:
-
-```javascript
-// getAudioDevices returns all audio devices connected
-// {
-//     "Speakerphone": false,
-//     "Earnpiece": true, // true indicates the selected device
-// }
-getAudioDevices()
-
-// getSelectedAudioDevice returns the selected audio device
-getSelectedAudioDevice()
-
-// selectAudioDevice selects the passed audio device for the current active call
-selectAudioDevice(name: string)
-```
-
 #### Event deviceDidReceiveIncoming
 
-When a call invite is received, the [SHAKEN/STIR](https://www.twilio.com/docs/voice/trusted-calling-using-shakenstir) `caller_verification` field has been added to the list of params for  `deviceDidReceiveIncoming`. Values are: `verified`, `unverified`, `unknown`.
+When a call invite is received, the [SHAKEN/STIR](https://www.twilio.com/docs/voice/trusted-calling-using-shakenstir) `caller_verification` field has been added to the list of params for `deviceDidReceiveIncoming`. Values are: `verified`, `unverified`, `unknown`.
 
 ## ICE
 
@@ -231,9 +209,9 @@ Data passed to the event `deviceDidReceiveIncoming` does not contain the key `ca
 
 - iOS: params changes for `connectionDidConnect` and `connectionDidDisconnect`
 
-    to => call_to
-    from => call_from
-    error => err
+  to => call_to
+  from => call_from
+  error => err
 
 New features
 
@@ -257,8 +235,8 @@ iOS application can now receive the following events, that in v3 where only disp
 
 - initWitToken returns an object with a property `initialized` instead of `initilized`
 - iOS event `connectionDidConnect` returns the same properties as Android
-move property `to` => `call_to`
-move property `from` => `call_from`
+  move property `to` => `call_to`
+  move property `from` => `call_from`
 
 ### Installation
 
@@ -290,6 +268,7 @@ Follow the [instructions in the React Native documentation](https://facebook.git
 
 After you have linked the library with `react-native link react-native-twilio-programmable-voice`
 check that `libRNTwilioVoice.a` is present under YOUR_TARGET > Build Phases > Link Binaries With Libraries. If it is not present you can add it using the + sign at the bottom of that list.
+
 </details>
 
 ```bash
@@ -298,7 +277,7 @@ cd ios && pod install
 
 #### CallKit
 
-The iOS library works through [CallKit](https://developer.apple.com/reference/callkit) and handling calls is much simpler than the  Android implementation as CallKit handles the inbound calls answering, ignoring, or rejecting. Outbound calls must be controlled by custom React-Native screens and controls.
+The iOS library works through [CallKit](https://developer.apple.com/reference/callkit) and handling calls is much simpler than the Android implementation as CallKit handles the inbound calls answering, ignoring, or rejecting. Outbound calls must be controlled by custom React-Native screens and controls.
 
 To pass caller's name to CallKit via Voip push notification add custom parameter 'CallerName' to Twilio Dial verb.
 
@@ -378,6 +357,7 @@ dependencies {
 ```
 
 #### `android/app/src/main/.../MainApplication.java`
+
 On top, where imports are:
 
 ```java
@@ -396,39 +376,40 @@ protected List<ReactPackage> getPackages() {
     );
 }
 ```
+
 </details>
 
 ## Usage
 
 ```javascript
-import TwilioVoice from 'react-native-twilio-programmable-voice'
+import TwilioVoice from "react-native-twilio-programmable-voice";
 
 // ...
 
 // initialize the Programmable Voice SDK passing an access token obtained from the server.
 // Listen to deviceReady and deviceNotReady events to see whether the initialization succeeded.
 async function initTelephony() {
-    try {
-        const accessToken = await getAccessTokenFromServer()
-        const success = await TwilioVoice.initWithToken(accessToken)
-    } catch (err) {
-        console.err(err)
-    }
+  try {
+    const accessToken = await getAccessTokenFromServer();
+    const success = await TwilioVoice.initWithToken(accessToken);
+  } catch (err) {
+    console.err(err);
+  }
 }
 
 function initTelephonyWithToken(token) {
-    TwilioVoice.initWithAccessToken(token)
+  TwilioVoice.initWithAccessToken(token);
 
-    // iOS only, configure CallKit
-    try {
-        TwilioVoice.configureCallKit({
-            appName:       'TwilioVoiceExample',                  // Required param
-            imageName:     'my_image_name_in_bundle',             // OPTIONAL
-            ringtoneSound: 'my_ringtone_sound_filename_in_bundle' // OPTIONAL
-        })
-    } catch (err) {
-        console.err(err)
-    }
+  // iOS only, configure CallKit
+  try {
+    TwilioVoice.configureCallKit({
+      appName: "TwilioVoiceExample", // Required param
+      imageName: "my_image_name_in_bundle", // OPTIONAL
+      ringtoneSound: "my_ringtone_sound_filename_in_bundle", // OPTIONAL
+    });
+  } catch (err) {
+    console.err(err);
+  }
 }
 ```
 
@@ -436,137 +417,138 @@ function initTelephonyWithToken(token) {
 
 ```javascript
 // add listeners (flowtype notation)
-TwilioVoice.addEventListener('deviceReady', function() {
-    // no data
-})
-TwilioVoice.addEventListener('deviceNotReady', function(data) {
-    // {
-    //     err: string
-    // }
-})
-TwilioVoice.addEventListener('connectionDidConnect', function(data) {
-    // {
-    //     call_sid: string,  // Twilio call sid
-    //     call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
-    //     call_from: string, // "+441234567890"
-    //     call_to: string,   // "client:bob"
-    // }
-})
-TwilioVoice.addEventListener('connectionIsReconnecting', function(data) {
-    // {
-    //     call_sid: string,  // Twilio call sid
-    //     call_from: string, // "+441234567890"
-    //     call_to: string,   // "client:bob"
-    // }
-})
-TwilioVoice.addEventListener('connectionDidReconnect', function(data) {
-    // {
-    //     call_sid: string,  // Twilio call sid
-    //     call_from: string, // "+441234567890"
-    //     call_to: string,   // "client:bob"
-    // }
-})
-TwilioVoice.addEventListener('connectionDidDisconnect', function(data: mixed) {
-    //   | null
-    //   | {
-    //       err: string
-    //     }
-    //   | {
-    //         call_sid: string,  // Twilio call sid
-    //         call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
-    //         call_from: string, // "+441234567890"
-    //         call_to: string,   // "client:bob"
-    //         err?: string,
-    //     }
-})
-TwilioVoice.addEventListener('callStateRinging', function(data: mixed) {
-    //   {
-    //       call_sid: string,  // Twilio call sid
-    //       call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
-    //       call_from: string, // "+441234567890"
-    //       call_to: string,   // "client:bob"
-    //   }
-})
-TwilioVoice.addEventListener('callInviteCancelled', function(data: mixed) {
-    //   {
-    //       call_sid: string,  // Twilio call sid
-    //       call_from: string, // "+441234567890"
-    //       call_to: string,   // "client:bob"
-    //   }
-})
+TwilioVoice.addEventListener("deviceReady", function () {
+  // no data
+});
+TwilioVoice.addEventListener("deviceNotReady", function (data) {
+  // {
+  //     err: string
+  // }
+});
+TwilioVoice.addEventListener("connectionDidConnect", function (data) {
+  // {
+  //     call_sid: string,  // Twilio call sid
+  //     call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
+  //     call_from: string, // "+441234567890"
+  //     call_to: string,   // "client:bob"
+  // }
+});
+TwilioVoice.addEventListener("connectionIsReconnecting", function (data) {
+  // {
+  //     call_sid: string,  // Twilio call sid
+  //     call_from: string, // "+441234567890"
+  //     call_to: string,   // "client:bob"
+  // }
+});
+TwilioVoice.addEventListener("connectionDidReconnect", function (data) {
+  // {
+  //     call_sid: string,  // Twilio call sid
+  //     call_from: string, // "+441234567890"
+  //     call_to: string,   // "client:bob"
+  // }
+});
+TwilioVoice.addEventListener("connectionDidDisconnect", function (data: mixed) {
+  //   | null
+  //   | {
+  //       err: string
+  //     }
+  //   | {
+  //         call_sid: string,  // Twilio call sid
+  //         call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
+  //         call_from: string, // "+441234567890"
+  //         call_to: string,   // "client:bob"
+  //         err?: string,
+  //     }
+});
+TwilioVoice.addEventListener("callStateRinging", function (data: mixed) {
+  //   {
+  //       call_sid: string,  // Twilio call sid
+  //       call_state: 'CONNECTED' | 'ACCEPTED' | 'CONNECTING' | 'RINGING' | 'DISCONNECTED' | 'CANCELLED',
+  //       call_from: string, // "+441234567890"
+  //       call_to: string,   // "client:bob"
+  //   }
+});
+TwilioVoice.addEventListener("callInviteCancelled", function (data: mixed) {
+  //   {
+  //       call_sid: string,  // Twilio call sid
+  //       call_from: string, // "+441234567890"
+  //       call_to: string,   // "client:bob"
+  //   }
+});
 
 // iOS Only
-TwilioVoice.addEventListener('callRejected', function(value: 'callRejected') {})
+TwilioVoice.addEventListener(
+  "callRejected",
+  function (value: "callRejected") {}
+);
 
-TwilioVoice.addEventListener('deviceDidReceiveIncoming', function(data) {
-    // {
-    //     call_sid: string,  // Twilio call sid
-    //     call_from: string, // "+441234567890"
-    //     call_to: string,   // "client:bob"
-    // }
-})
-
-// Android Only
-TwilioVoice.addEventListener('proximity', function(data) {
-    // {
-    //     isNear: boolean
-    // }
-})
+TwilioVoice.addEventListener("deviceDidReceiveIncoming", function (data) {
+  // {
+  //     call_sid: string,  // Twilio call sid
+  //     call_from: string, // "+441234567890"
+  //     call_to: string,   // "client:bob"
+  // }
+});
 
 // Android Only
-TwilioVoice.addEventListener('wiredHeadset', function(data) {
-    // {
-    //     isPlugged: boolean,
-    //     hasMic: boolean,
-    //     deviceName: string
-    // }
-})
+TwilioVoice.addEventListener("proximity", function (data) {
+  // {
+  //     isNear: boolean
+  // }
+});
+
+// Android Only
+TwilioVoice.addEventListener("wiredHeadset", function (data) {
+  // {
+  //     isPlugged: boolean,
+  //     hasMic: boolean,
+  //     deviceName: string
+  // }
+});
 
 // ...
 
 // start a call
-TwilioVoice.connect({To: '+61234567890'})
+TwilioVoice.connect({ To: "+61234567890" });
 
 // hangup
-TwilioVoice.disconnect()
+TwilioVoice.disconnect();
 
 // accept an incoming call (Android only, in iOS CallKit provides the UI for this)
-TwilioVoice.accept()
+TwilioVoice.accept();
 
 // reject an incoming call (Android only, in iOS CallKit provides the UI for this)
-TwilioVoice.reject()
+TwilioVoice.reject();
 
 // ignore an incoming call (Android only)
-TwilioVoice.ignore()
+TwilioVoice.ignore();
 
 // mute or un-mute the call
 // mutedValue must be a boolean
-TwilioVoice.setMuted(mutedValue)
+TwilioVoice.setMuted(mutedValue);
 
 // put a call on hold
-TwilioVoice.hold(holdValue)
+TwilioVoice.hold(holdValue);
 
 // send digits
-TwilioVoice.sendDigits(digits)
+TwilioVoice.sendDigits(digits);
 
 // Ensure that an active call is displayed when the app comes to foreground
-TwilioVoice.getActiveCall()
-    .then(activeCall => {
-        if (activeCall){
-            _displayActiveCall(activeCall)
-        }
-    })
+TwilioVoice.getActiveCall().then((activeCall) => {
+  if (activeCall) {
+    _displayActiveCall(activeCall);
+  }
+});
 
 // Ensure that call invites are displayed when the app comes to foreground
-TwilioVoice.getCallInvite()
-    .then(callInvite => {
-        if (callInvite){
-            _handleCallInvite(callInvite)
-        }
-    })
+TwilioVoice.getCallInvite().then((callInvite) => {
+  if (callInvite) {
+    _handleCallInvite(callInvite);
+  }
+});
 
 // Unregister device with Twilio
-TwilioVoice.unregister()
+TwilioVoice.unregister();
 ```
 
 ## Help wanted

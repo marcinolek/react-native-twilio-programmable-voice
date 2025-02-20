@@ -419,7 +419,7 @@ withCompletionHandler:(void (^)(void))completion {
     * with a `TVOCancelledCallInvite` if the caller hangs up or the client encounters any other error before the called
     * party could answer or reject the call.
     */
-    NSLog(@"cancelledCallInviteReceived with error %@", error);
+    NSLog(@"cancelledCallInviteReceived with error");
     TVOCallInvite *callInvite;
     for (NSString *activeCallInviteId in self.activeCallInvites) {
         TVOCallInvite *activeCallInvite = [self.activeCallInvites objectForKey:activeCallInviteId];
